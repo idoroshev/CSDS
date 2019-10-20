@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RsaService } from '../services/rsa.service';
 
 @Component({
   selector: 'app-home',
@@ -8,7 +9,7 @@ import { Component } from '@angular/core';
 export class HomePage {
   text: string;
 
-  constructor() {}
+  constructor(private rsaService: RsaService) {}
 
   onGetFile(text: string) {
     this.text = text;
