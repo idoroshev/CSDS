@@ -9,4 +9,8 @@ export class HomePage {
 
   constructor() {}
 
+  onGetFile(text: string) {
+    console.log(text);
+  }
+
 }

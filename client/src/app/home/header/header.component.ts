@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { AlertController, ToastController } from '@ionic/angular';
 
 import { FileService } from '../../services/file.service';
 import { File } from '../../interfaces/file';
@@ -11,9 +11,11 @@ import { File } from '../../interfaces/file';
 })
 export class HeaderComponent implements OnInit {
   title = 'BakDor';
+  @Output() getFile = new EventEmitter<string>();
 
   constructor(
     private alertController: AlertController,
+    private toastController: ToastController,
     private fileService: FileService,
   ) { }
 
@@ -38,8 +40,17 @@ export class HeaderComponent implements OnInit {
           text: 'Ok',
           handler: (file: File) => {
             this.fileService.getFile(file.name).subscribe(text => {
-              console.log(text);
-            });
+              this.getFile.emit(text);
+            },
+            async errorMessage => {
+              const errorToast = await this.toastController.create({
+                message: errorMessage,
+                duration: 2000,
+                color: 'danger',
+              });
+              await errorToast.present();
+            },
+            );
           }
         }
       ]
