@@ -6,11 +6,12 @@ import { Component } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  text: string;
 
   constructor() {}
 
   onGetFile(text: string) {
-    console.log(text);
+    this.text = text;
   }
 
 }
