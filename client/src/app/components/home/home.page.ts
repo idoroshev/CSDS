@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RsaService } from '../services/rsa.service';
+import { RsaService } from '../../services/rsa.service';
 
 @Component({
   selector: 'app-home',

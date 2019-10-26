@@ -1,8 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 
-import { FileService } from '../../services/file.service';
-import { File } from '../../interfaces/file';
+import { FileService } from '../../../services/file.service';
+import { File } from '../../../interfaces/file';
 
 @Component({
   selector: 'app-header',
@@ -49,8 +49,7 @@ export class HeaderComponent implements OnInit {
                 color: 'danger',
               });
               await errorToast.present();
-            },
-            );
+            });
           }
         }
       ]
