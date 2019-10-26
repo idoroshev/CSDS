@@ -1,8 +1,8 @@
 package org.csds.lab2.server.config;
 
-import org.csds.lab2.server.security.LoginFailureHandler;
-import org.csds.lab2.server.security.LoginSuccessHandler;
-import org.csds.lab2.server.security.LogoutSuccessHandler;
+import org.csds.lab2.server.auth.LoginFailureHandler;
+import org.csds.lab2.server.auth.LoginSuccessHandler;
+import org.csds.lab2.server.auth.LogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

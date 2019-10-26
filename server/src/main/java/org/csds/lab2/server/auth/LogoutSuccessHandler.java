@@ -1,5 +1,6 @@
-package org.csds.lab2.server.security;
+package org.csds.lab2.server.auth;
 
+import org.csds.lab2.server.security.KeyStore;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;

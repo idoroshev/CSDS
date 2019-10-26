@@ -1,4 +1,4 @@
-package org.csds.lab2.server.security;
+package org.csds.lab2.server.auth;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
