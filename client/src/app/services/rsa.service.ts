@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { isPrime, isRelativelyPrime, gcd } from '../utils/index';
+import { isPrime, isRelativelyPrime, gcd, pow } from '../utils/index';
+import { IRsa, IPrivateKey } from '../interfaces/rsa';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RsaService {
-
-  constructor() { }
-
-  rsa(p: number, q: number) {
+  rsa(p: number, q: number): IRsa {
     if (!isPrime(p) || !isPrime(q)) {
       return null;
     }
@@ -33,5 +31,20 @@ export class RsaService {
         break;
       }
     }
+
+    return {
+      publicKey: { e, n },
+      privateKey: { d, n }
+    } as IRsa;
+  }
+
+  decryptSessionKey(sessionKey: string, privateKey: IPrivateKey) {
+    const chars: string[] = sessionKey.split(' ');
+    let result = '';
+    chars.forEach(char => {
+      const charCode = pow(Number(char), privateKey.d, privateKey.n);
+      result += String.fromCharCode(charCode);
+    });
+    return result;
   }
 }

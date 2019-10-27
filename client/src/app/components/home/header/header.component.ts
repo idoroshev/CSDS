@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 
-import { FileService } from '../../../services/file.service';
+import { HttpService } from '../../../services/http.service';
 import { File } from '../../../interfaces/file';
 
 @Component({
@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     private alertController: AlertController,
     private toastController: ToastController,
-    private fileService: FileService,
+    private httpService: HttpService,
   ) { }
 
   ngOnInit() {}
@@ -39,12 +39,12 @@ export class HeaderComponent implements OnInit {
         }, {
           text: 'Ok',
           handler: (file: File) => {
-            this.fileService.getFile(file.name).subscribe(text => {
+            this.httpService.getFile(file.name).subscribe(text => {
               this.getFile.emit(text);
             },
-            async errorMessage => {
+            async e => {
               const errorToast = await this.toastController.create({
-                message: errorMessage,
+                message: e,
                 duration: 2000,
                 color: 'danger',
               });
