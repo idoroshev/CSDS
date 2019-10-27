@@ -3,6 +3,7 @@ package org.csds.lab2.server.config;
 import org.csds.lab2.server.auth.LoginFailureHandler;
 import org.csds.lab2.server.auth.LoginSuccessHandler;
 import org.csds.lab2.server.auth.LogoutSuccessHandler;
+import org.csds.lab2.server.auth.SimpleCorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -22,7 +24,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.cors().and().addFilterBefore(new SimpleCorsFilter(), ChannelProcessingFilter.class)
+            .authorizeRequests().antMatchers("/suka").permitAll()
             .anyRequest().authenticated()
             .and()
             .formLogin()

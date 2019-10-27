@@ -24,7 +24,7 @@ public class FileController {
     @RequestMapping(value = "files", method = RequestMethod.GET)
     public String getFile(HttpServletResponse response,
                           @RequestParam("name") String name) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
+        System.out.println(response);
         String text = fileService.getFile(name);
         if (text == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

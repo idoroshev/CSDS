@@ -36,7 +36,8 @@ public class SecurityController {
     }
 
     @RequestMapping(value = "login", method = RequestMethod.GET)
-    public void login(HttpServletResponse response) {
+    public String login(HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return "AAAAAAAAAA NAHUI";
     }
 }

@@ -3,6 +3,7 @@ package org.csds.lab2.server.auth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.csds.lab2.server.dto.PublicKey;
+import org.csds.lab2.server.security.EncryptionUtils;
 import org.csds.lab2.server.security.KeyStore;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -16,8 +17,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                       HttpServletResponse response,
-                                       Authentication authentication) throws JsonProcessingException {
+                                        HttpServletResponse response,
+                                        Authentication authentication) throws JsonProcessingException {
         String username = authentication.getName();
 
         request.getSession().setAttribute("username", username);
@@ -29,8 +30,15 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         PublicKey publicKey = objectMapper.readValue(body, PublicKey.class);
+        String sessionKey = EncryptionUtils.generateSessionKey();
+        String encrypted = EncryptionUtils.encrypt(sessionKey, publicKey);
+        try {
+            response.getWriter().println("{ \"session_key\" : \"" + encrypted + "\" }");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        KeyStore.getInstance().addSessionKey(username, "key");
+        KeyStore.getInstance().addSessionKey(username, sessionKey);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
