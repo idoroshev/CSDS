@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().addFilterBefore(new SimpleCorsFilter(), ChannelProcessingFilter.class)
-            .authorizeRequests().antMatchers("/suka").permitAll()
+            .authorizeRequests()
             .anyRequest().authenticated()
             .and()
             .formLogin()

@@ -1,6 +1,8 @@
 package org.csds.lab2.server.dto;
 
-public class PublicKey {
+import java.security.Key;
+
+public class PublicKey implements Key {
     private int n;
     private int e;
 
@@ -26,5 +28,20 @@ public class PublicKey {
 
     public void setN(int n) {
         this.n = n;
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return "RSA";
+    }
+
+    @Override
+    public String getFormat() {
+        return "X.509";
+    }
+
+    @Override
+    public byte[] getEncoded() {
+        return new byte[0];
     }
 }

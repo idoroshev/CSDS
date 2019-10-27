@@ -31,9 +31,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         ObjectMapper objectMapper = new ObjectMapper();
         PublicKey publicKey = objectMapper.readValue(body, PublicKey.class);
         String sessionKey = EncryptionUtils.generateSessionKey();
+        System.out.println("session key: " + sessionKey);
         String encrypted = EncryptionUtils.encrypt(sessionKey, publicKey);
         try {
-            response.getWriter().println("{ \"session_key\" : \"" + encrypted + "\" }");
+            response.getWriter().print(encrypted);
         } catch (IOException e) {
             e.printStackTrace();
         }

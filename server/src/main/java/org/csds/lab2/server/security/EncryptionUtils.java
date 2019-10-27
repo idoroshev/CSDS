@@ -1,41 +1,43 @@
 package org.csds.lab2.server.security;
 
-import org.apache.commons.codec.binary.Base64;
 import org.csds.lab2.server.dto.PublicKey;
-import sun.security.rsa.RSAPublicKeyImpl;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
 public class EncryptionUtils {
 
+    private static int pow(int a, int b, int m) {
+        int ans = 1;
+        while (b > 0) {
+            if ((b & 1) == 0) {
+                a = (a * a) % m;
+                b >>= 1;
+            } else {
+                ans = (ans * a) % m;
+                b--;
+            }
+        }
+        return ans;
+    }
+
     public static String generateSessionKey() {
         SecureRandom r = new SecureRandom();
-        byte[] aesKey = new byte[16];
-        r.nextBytes(aesKey);
-        return Arrays.toString(aesKey);
+        StringBuilder key = new StringBuilder();
+        for (int i = 0; i < 24; i++) {
+            key.append(Character.toString((char) (r.nextInt(26) + 97)));
+        }
+        return key.toString();
     }
 
     public static String encrypt(String value, PublicKey key) {
-        try {
-            RSAPublicKeyImpl rsaPublicKey =
-                    new RSAPublicKeyImpl(new BigInteger(String.valueOf(key.getN())), new BigInteger(String.valueOf(key.getE())));
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, rsaPublicKey);
-            return Base64.encodeBase64String(cipher.doFinal(value.getBytes(StandardCharsets.UTF_8)));
-
-        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
-            System.out.println("Cannot encrypt session key.");
-            e.printStackTrace();
-            return value;
+        StringBuilder encrypted = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            if (i > 0) {
+                encrypted.append(" ");
+            }
+            encrypted.append(pow((int) value.charAt(i), key.getE(), key.getN()));
         }
+        return encrypted.toString();
     }
 }
