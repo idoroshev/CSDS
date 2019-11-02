@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { isPrime, isRelativelyPrime, gcd, pow } from '../utils/index';
+import { isPrime, isRelativelyPrime, pow } from '../utils/index';
 import { IRsa, IPrivateKey } from '../interfaces/rsa';
 
 @Injectable({

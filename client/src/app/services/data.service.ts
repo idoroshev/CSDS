@@ -7,6 +7,7 @@ import { IRsa, IPublicKey, IPrivateKey } from '../interfaces/rsa';
 export class DataService {
   private rsa: IRsa;
   private sessionKey: string;
+  private username: string;
 
   public getRsa(): IRsa {
     return this.rsa;
@@ -38,5 +39,13 @@ export class DataService {
 
   public setSessionKey(sessionKey: string) {
     this.sessionKey = sessionKey;
+  }
+
+  public getUsername(): string {
+    return this.username;
+  }
+
+  public setUsername(username: string) {
+    this.username = username;
   }
 }

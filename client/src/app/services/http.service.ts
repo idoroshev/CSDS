@@ -27,17 +27,22 @@ export class HttpService {
     );
   }
 
-  login(username: string, password: string, publicKey: IPublicKey): Observable<string> {
+  session(username: string, publicKey: IPublicKey): Observable<string> {
+    return this.http.post(
+      `${this.serverUrl}:${this.port}/session`,
+      { username, ...publicKey },
+      { responseType: 'text' },
+    ).pipe(
+      catchError(e => {
+        return throwError(e);
+      }),
+    );
+  }
+
+  login(username: string, encryptedPassword: string): Observable<any> {
     return this.http.post(
       `${this.serverUrl}:${this.port}/login`,
-      { ...publicKey },
-      {
-        params: {
-          username,
-          password,
-        },
-        responseType: 'text',
-      }
+      { username, password: encryptedPassword },
     ).pipe(
       catchError(e => {
         return throwError(e);
