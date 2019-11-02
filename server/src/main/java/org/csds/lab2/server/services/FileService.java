@@ -2,6 +2,8 @@ package org.csds.lab2.server.services;
 
 import org.csds.lab2.server.config.Configuration;
 import org.csds.lab2.server.db.DBAdaptor;
+import org.csds.lab2.server.security.EncryptionUtils;
+import org.csds.lab2.server.security.KeyStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ public class FileService {
     }
 
     public String getFile(String name) {
-        return dbAdaptor.getFileText(name);
+        String text = dbAdaptor.getFileText(name);
+        //String encryptedText = EncryptionUtils.encryptByAES(text, KeyStore.getInstance().getSessionKey(username))
+        return text;
     }
 }
