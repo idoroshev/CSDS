@@ -3,11 +3,13 @@ import { AlertController, ToastController } from '@ionic/angular';
 
 import { HttpService } from '../../../services/http.service';
 import { File } from '../../../interfaces/file';
+import { DataService } from 'src/app/services/data.service';
+
+import { AES, enc, pad } from 'crypto-js';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
   title = 'BakDor';
@@ -17,6 +19,7 @@ export class HeaderComponent implements OnInit {
     private alertController: AlertController,
     private toastController: ToastController,
     private httpService: HttpService,
+    private dataService: DataService,
   ) { }
 
   ngOnInit() {}
@@ -39,8 +42,16 @@ export class HeaderComponent implements OnInit {
         }, {
           text: 'Ok',
           handler: (file: File) => {
-            this.httpService.getFile(file.name).subscribe(text => {
-              this.getFile.emit(text);
+            this.httpService.getFile(file.name, this.dataService.getUsername()).subscribe(text => {
+              console.log(this.dataService.getSessionKey());
+              const decryptedText = AES.decrypt(text, this.dataService.getSessionKey(), {
+                iv: 'RandomInitVector',
+                padding: pad.NoPadding
+              });
+              console.log(decryptedText);
+              console.log(decryptedText.toString());
+              console.log(decryptedText.toString(enc.Utf8));
+              this.getFile.emit('hui');
             },
             async e => {
               const errorToast = await this.toastController.create({

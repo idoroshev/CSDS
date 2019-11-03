@@ -14,10 +14,11 @@ export class HttpService {
 
   constructor(private http: HttpClient) { }
 
-  getFile(fileName: string): Observable<string> {
+  getFile(fileName: string, username: string): Observable<string> {
     return this.http.get(`${this.serverUrl}:${this.port}/files`, {
       params:  {
         name: fileName,
+        username,
       },
       responseType: 'text',
     }).pipe(

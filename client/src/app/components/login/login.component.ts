@@ -6,12 +6,13 @@ import { HttpService } from 'src/app/services/http.service';
 import { RsaService } from 'src/app/services/rsa.service';
 import { DataService } from 'src/app/services/data.service';
 
-import { AES, enc } from 'crypto-js';
+import { AES, enc, pad, Padding } from 'crypto-js';
+import { Router } from '@angular/router';
+import { padding } from 'aes-js';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   loginData = new FormGroup({
@@ -21,6 +22,7 @@ export class LoginComponent {
 
   constructor(
     private httpService: HttpService,
+    private router: Router,
     private toastController: ToastController,
     private rsaService: RsaService,
     private dataService: DataService,
@@ -41,17 +43,22 @@ export class LoginComponent {
         const sessionKey = this.rsaService.decryptSessionKey(EncryptedSessionKey, this.dataService.getPrivateKey());
         this.dataService.setSessionKey(sessionKey);
         this.dataService.setUsername(username);
+        const encryptedPassword = AES.encrypt(password, sessionKey, {
+          iv: 'RandomInitVector',
+          padding: pad.NoPadding
+        });
+        const decryptedPassword = AES.decrypt(encryptedPassword, sessionKey, {
+          iv: 'RandomInitVector',
+          padding: pad.NoPadding
+        });
 
-        const encryptedPassword = AES.encrypt(password, sessionKey);
-        const decryptedPassword = AES.decrypt(encryptedPassword, sessionKey);
-
-        console.log(this.dataService.getSessionKey());
-        console.log(encryptedPassword.toString().length);
-        console.log(decryptedPassword.toString(enc.Utf8));
+        //console.log(this.dataService.getSessionKey());
+        //console.log(encryptedPassword.toString().length);
+        //console.log(decryptedPassword.toString(enc.Utf8));
 
         this.httpService.login(username, encryptedPassword.toString()).subscribe(
           () => {
-            console.log('Success');
+            this.router.navigate(['/home']);
           },
           async e => {
             const errorToast = await this.toastController.create({
