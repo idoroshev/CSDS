@@ -5,6 +5,11 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { IPublicKey } from '../interfaces/rsa';
 
+export interface ISessionResponse {
+  sessionKey: string;
+  initVector: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,19 +28,27 @@ export class HttpService {
       responseType: 'text',
     }).pipe(
       catchError(e => {
-        return throwError(e);
+        if (e.error) {
+          return throwError((JSON.parse(e.error) as any).message);
+        } else {
+          return throwError(e);
+        }
       }),
     );
   }
 
-  session(username: string, publicKey: IPublicKey): Observable<string> {
-    return this.http.post(
+  session(username: string, publicKey: IPublicKey): Observable<ISessionResponse> {
+    return this.http.post<ISessionResponse>(
       `${this.serverUrl}:${this.port}/session`,
       { username, ...publicKey },
-      { responseType: 'text' },
+      { responseType: 'json' },
     ).pipe(
       catchError(e => {
-        return throwError(e);
+        if (e.error) {
+          return throwError((JSON.parse(e.error) as any).message);
+        } else {
+          return throwError(e);
+        }
       }),
     );
   }
@@ -46,7 +59,26 @@ export class HttpService {
       { username, password: encryptedPassword },
     ).pipe(
       catchError(e => {
-        return throwError(e);
+        if (e.error) {
+          return throwError((JSON.parse(e.error) as any).message);
+        } else {
+          return throwError(e);
+        }
+      }),
+    );
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(
+      `${this.serverUrl}:${this.port}/logout`,
+      null,
+    ).pipe(
+      catchError(e => {
+        if (e.error) {
+          return throwError((JSON.parse(e.error) as any).message);
+        } else {
+          return throwError(e);
+        }
       }),
     );
   }

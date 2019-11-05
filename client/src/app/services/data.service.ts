@@ -7,6 +7,7 @@ import { IRsa, IPublicKey, IPrivateKey } from '../interfaces/rsa';
 export class DataService {
   private rsa: IRsa;
   private sessionKey: string;
+  private initVector: string;
   private username: string;
 
   public getRsa(): IRsa {
@@ -31,6 +32,14 @@ export class DataService {
 
   public setPrivateKey(privateKey: IPrivateKey) {
     this.rsa.privateKey = privateKey;
+  }
+
+  public getInitVector(): string {
+    return this.initVector;
+  }
+
+  public setInitVector(initVector: string) {
+    this.initVector = initVector;
   }
 
   public getSessionKey(): string {

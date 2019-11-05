@@ -2,13 +2,12 @@ import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 
-import { HttpService } from 'src/app/services/http.service';
+import { HttpService, ISessionResponse } from 'src/app/services/http.service';
 import { RsaService } from 'src/app/services/rsa.service';
 import { DataService } from 'src/app/services/data.service';
 
-import { AES, enc, pad, Padding } from 'crypto-js';
 import { Router } from '@angular/router';
-import { padding } from 'aes-js';
+import { utils, padding, ModeOfOperation } from 'aes-js';
 
 @Component({
   selector: 'app-login',
@@ -39,24 +38,21 @@ export class LoginComponent {
       username,
       { ...rsa.publicKey }
     ).subscribe(
-      EncryptedSessionKey => {
-        const sessionKey = this.rsaService.decryptSessionKey(EncryptedSessionKey, this.dataService.getPrivateKey());
+      (sessionResponse: ISessionResponse) => {
+        const sessionKey = this.rsaService.decryptKey(sessionResponse.sessionKey, this.dataService.getPrivateKey());
+        const initVector = this.rsaService.decryptKey(sessionResponse.initVector, this.dataService.getPrivateKey());
         this.dataService.setSessionKey(sessionKey);
+        this.dataService.setInitVector(initVector);
         this.dataService.setUsername(username);
-        const encryptedPassword = AES.encrypt(password, sessionKey, {
-          iv: 'RandomInitVector',
-          padding: pad.NoPadding
-        });
-        const decryptedPassword = AES.decrypt(encryptedPassword, sessionKey, {
-          iv: 'RandomInitVector',
-          padding: pad.NoPadding
-        });
 
-        //console.log(this.dataService.getSessionKey());
-        //console.log(encryptedPassword.toString().length);
-        //console.log(decryptedPassword.toString(enc.Utf8));
+        const key = utils.utf8.toBytes(sessionKey);
+        const iv = utils.utf8.toBytes(initVector);
+        const textBytes = utils.utf8.toBytes(password);
+        const aesCbc = new ModeOfOperation.cbc(key, iv);
+        const encryptedBytes = aesCbc.encrypt(padding.pkcs7.pad(textBytes));
+        const encryptedHex = utils.hex.fromBytes(encryptedBytes);
 
-        this.httpService.login(username, encryptedPassword.toString()).subscribe(
+        this.httpService.login(username, encryptedHex).subscribe(
           () => {
             this.router.navigate(['/home']);
           },

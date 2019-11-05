@@ -1,11 +1,12 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { utils, padding, ModeOfOperation } from 'aes-js';
 
 import { HttpService } from '../../../services/http.service';
 import { File } from '../../../interfaces/file';
 import { DataService } from 'src/app/services/data.service';
 
-import { AES, enc, pad } from 'crypto-js';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +20,8 @@ export class HeaderComponent implements OnInit {
     private alertController: AlertController,
     private toastController: ToastController,
     private httpService: HttpService,
-    private dataService: DataService,
+    public dataService: DataService,
+    private router: Router,
   ) { }
 
   ngOnInit() {}
@@ -43,15 +45,14 @@ export class HeaderComponent implements OnInit {
           text: 'Ok',
           handler: (file: File) => {
             this.httpService.getFile(file.name, this.dataService.getUsername()).subscribe(text => {
-              console.log(this.dataService.getSessionKey());
-              const decryptedText = AES.decrypt(text, this.dataService.getSessionKey(), {
-                iv: 'RandomInitVector',
-                padding: pad.NoPadding
-              });
-              console.log(decryptedText);
-              console.log(decryptedText.toString());
-              console.log(decryptedText.toString(enc.Utf8));
-              this.getFile.emit('hui');
+              const key = utils.utf8.toBytes(this.dataService.getSessionKey());
+              const iv = utils.utf8.toBytes(this.dataService.getInitVector());
+              const encryptedBytes = utils.hex.toBytes(text);
+              const aesCbc = new ModeOfOperation.cbc(key, iv);
+              const decryptedBytes = aesCbc.decrypt(encryptedBytes);
+              const decryptedText = utils.utf8.fromBytes(padding.pkcs7.strip(decryptedBytes));
+
+              this.getFile.emit(decryptedText);
             },
             async e => {
               const errorToast = await this.toastController.create({
@@ -67,6 +68,23 @@ export class HeaderComponent implements OnInit {
     });
 
     await alert.present();
+  }
+
+  login() {
+    this.router.navigate(['/login']);
+  }
+
+  logout() {
+    this.httpService.logout().subscribe({
+      error: async e => {
+        const errorToast = await this.toastController.create({
+          message: e,
+          duration: 2000,
+          color: 'danger',
+        });
+        await errorToast.present();
+      }
+    });
   }
 
 }

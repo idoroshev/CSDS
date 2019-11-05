@@ -38,7 +38,7 @@ export class RsaService {
     } as IRsa;
   }
 
-  decryptSessionKey(sessionKey: string, privateKey: IPrivateKey) {
+  decryptKey(sessionKey: string, privateKey: IPrivateKey) {
     const chars: string[] = sessionKey.split(' ');
     let result = '';
     chars.forEach(char => {

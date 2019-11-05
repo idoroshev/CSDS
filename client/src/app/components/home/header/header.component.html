@@ -5,6 +5,16 @@
         <ion-icon slot="icon-only" name="document"></ion-icon>
       </ion-button>
     </ion-buttons>
+    <ion-buttons slot="primary" *ngIf="!this.dataService.getSessionKey()">
+      <ion-button (click)="login()">
+        <ion-icon slot="icon-only" name="log-in"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="primary" *ngIf="this.dataService.getSessionKey()">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>
       {{ title }}
     </ion-title>
