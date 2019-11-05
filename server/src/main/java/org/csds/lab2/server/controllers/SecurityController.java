@@ -1,5 +1,6 @@
 package org.csds.lab2.server.controllers;
 
+import org.csds.lab2.server.dto.CipherParams;
 import org.csds.lab2.server.dto.UserPublicKey;
 import org.csds.lab2.server.services.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class SecurityController {
     }
 
     @RequestMapping(value = "session", method = RequestMethod.POST)
-    public String getSessionKey(@RequestBody UserPublicKey key) {
+    public CipherParams getSessionKey(@RequestBody UserPublicKey key) {
         return securityService.createSessionKey(key);
     }
 
