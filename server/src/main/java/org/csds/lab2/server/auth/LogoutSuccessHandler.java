@@ -12,7 +12,9 @@ public class LogoutSuccessHandler implements org.springframework.security.web.au
     public void onLogoutSuccess(HttpServletRequest request,
                                 HttpServletResponse response,
                                 Authentication authentication) {
-        KeyStore.getInstance().removeSessionKey(authentication.getName());
+        if (authentication != null && authentication.getPrincipal() != null && KeyStore.getInstance().getSessionKey((String) authentication.getPrincipal()) != null) {
+            KeyStore.getInstance().removeSessionKey(authentication.getName());
+        }
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }

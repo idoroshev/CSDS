@@ -21,7 +21,7 @@ public class KeyStore {
     }
 
     public void addSessionKey(String username, String key) {
-        keyStorage.put(username, new Pair<>(key, System.currentTimeMillis() + 10 * MILLISECONDS_IN_MINUTE));
+        keyStorage.put(username, new Pair<>(key, System.currentTimeMillis() + 2 * MILLISECONDS_IN_MINUTE));
     }
 
     public boolean expired(String username) {
