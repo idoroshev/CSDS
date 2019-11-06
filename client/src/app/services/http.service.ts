@@ -14,7 +14,7 @@ export interface ISessionResponse {
   providedIn: 'root'
 })
 export class HttpService {
-  serverUrl = 'http://192.168.0.12';
+  serverUrl = 'http://10.160.58.116';
   port = 8080;
 
   constructor(private http: HttpClient) { }
@@ -31,7 +31,7 @@ export class HttpService {
         if (e.error) {
           return throwError((JSON.parse(e.error) as any).message);
         } else {
-          return throwError(e);
+          return throwError('Something went wrong');
         }
       }),
     );
@@ -47,7 +47,7 @@ export class HttpService {
         if (e.error) {
           return throwError((JSON.parse(e.error) as any).message);
         } else {
-          return throwError(e);
+          return throwError('Something went wrong');
         }
       }),
     );
@@ -62,7 +62,7 @@ export class HttpService {
         if (e.error) {
           return throwError((JSON.parse(e.error) as any).message);
         } else {
-          return throwError(e);
+          return throwError('Something went wrong');
         }
       }),
     );
@@ -77,7 +77,7 @@ export class HttpService {
         if (e.error) {
           return throwError((JSON.parse(e.error) as any).message);
         } else {
-          return throwError(e);
+          return throwError('Something went wrong');
         }
       }),
     );
