@@ -1,0 +1,10 @@
+﻿Sorry, there was a problem downloading some files from OneDrive. Please try again.
+
+header.component.scss - https://onedrive.live.com/?cid=08035f7694733cd2&id=8035F7694733CD2%21158364&action=Download
+
+login.component.scss - https://onedrive.live.com/?cid=08035f7694733cd2&id=8035F7694733CD2%21158362&action=Download
+
+app.component.scss - https://onedrive.live.com/?cid=08035f7694733cd2&id=8035F7694733CD2%2199660&action=Download
+
+
+
