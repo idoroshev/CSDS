@@ -1,16 +1,14 @@
-package org.csds.lab2.server.dto;
+package org.csds.lab2.server.security;
 
-public class CipherParams {
+public class UserData {
+
     private String sessionKey;
-    private String initVector;
+    private Long expirationTime;
     private String nextToken;
 
-    public CipherParams() {
-    }
-
-    public CipherParams(String sessionKey, String initVector, String nextToken) {
+    public UserData(String sessionKey, Long expirationTime, String nextToken) {
         this.sessionKey = sessionKey;
-        this.initVector = initVector;
+        this.expirationTime = expirationTime;
         this.nextToken = nextToken;
     }
 
@@ -22,12 +20,12 @@ public class CipherParams {
         this.sessionKey = sessionKey;
     }
 
-    public String getInitVector() {
-        return initVector;
+    public Long getExpirationTime() {
+        return expirationTime;
     }
 
-    public void setInitVector(String initVector) {
-        this.initVector = initVector;
+    public void setExpirationTime(Long expirationTime) {
+        this.expirationTime = expirationTime;
     }
 
     public String getNextToken() {

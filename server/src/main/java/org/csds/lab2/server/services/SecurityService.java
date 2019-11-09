@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
     public CipherParams createSessionKey(UserPublicKey publicKey) {
-        String sessionKey = EncryptionUtils.generateSessionKey();
+        String sessionKey = EncryptionUtils.generateRandomKey();
         String initVector = EncryptionUtils.initVector;
         System.out.println("session key: " + sessionKey);
         KeyStore.getInstance().addSessionKey(publicKey.getUsername(), sessionKey);
-        return new CipherParams(EncryptionUtils.encryptByRSA(sessionKey, publicKey), EncryptionUtils.encryptByRSA(initVector, publicKey));
+        return new CipherParams(EncryptionUtils.encryptByRSA(sessionKey, publicKey),
+                EncryptionUtils.encryptByRSA(initVector, publicKey),
+                KeyStore.getInstance().getNextToken(publicKey.getUsername()));
     }
 
 }

@@ -34,7 +34,7 @@ public class EncryptionUtils {
         return ans;
     }
 
-    public static String generateSessionKey() {
+    public static String generateRandomKey() {
         SecureRandom r = new SecureRandom();
         StringBuilder key = new StringBuilder();
         for (int i = 0; i < 16; i++) {
