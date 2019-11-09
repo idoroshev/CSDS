@@ -9,6 +9,7 @@ export class DataService {
   private sessionKey: string;
   private initVector: string;
   private username: string;
+  private nextToken: string;
 
   public getRsa(): IRsa {
     return this.rsa;
@@ -56,5 +57,13 @@ export class DataService {
 
   public setUsername(username: string) {
     this.username = username;
+  }
+
+  public getNextToken(): string {
+    return this.nextToken;
+  }
+
+  public setNextToken(nextToken: string) {
+    this.nextToken = nextToken;
   }
 }

@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 import { HttpService, ISessionResponse } from 'src/app/services/http.service';
 import { RsaService } from 'src/app/services/rsa.service';
 import { DataService } from 'src/app/services/data.service';
 
-import { Router } from '@angular/router';
 import { utils, padding, ModeOfOperation } from 'aes-js';
+import { decryptNextToken, encryptNextToken } from '../../utils/index';
 
 @Component({
   selector: 'app-login',
@@ -38,9 +39,9 @@ export class LoginComponent {
       username,
       { ...rsa.publicKey }
     ).subscribe(
-      (sessionResponse: ISessionResponse) => {
-        const sessionKey = this.rsaService.decryptKey(sessionResponse.sessionKey, this.dataService.getPrivateKey());
-        const initVector = this.rsaService.decryptKey(sessionResponse.initVector, this.dataService.getPrivateKey());
+      (response: ISessionResponse) => {
+        const sessionKey = this.rsaService.decryptKey(response.sessionKey, this.dataService.getPrivateKey());
+        const initVector = this.rsaService.decryptKey(response.initVector, this.dataService.getPrivateKey());
         this.dataService.setSessionKey(sessionKey);
         this.dataService.setInitVector(initVector);
         this.dataService.setUsername(username);
@@ -52,8 +53,16 @@ export class LoginComponent {
         const encryptedBytes = aesCbc.encrypt(padding.pkcs7.pad(textBytes));
         const encryptedHex = utils.hex.fromBytes(encryptedBytes);
 
-        this.httpService.login(username, encryptedHex).subscribe(
-          () => {
+        let decryptedNextToken = decryptNextToken(sessionKey, initVector, response.nextToken);
+        let encryptedNextToken = encryptNextToken(sessionKey, initVector, decryptedNextToken + username);
+        this.dataService.setNextToken(encryptedNextToken);
+
+        this.httpService.login(username, encryptedHex, encryptedNextToken).subscribe(
+          ({ nextToken }) => {
+            console.log(nextToken);
+            decryptedNextToken = decryptNextToken(sessionKey, initVector, nextToken);
+            encryptedNextToken = encryptNextToken(sessionKey, initVector, decryptedNextToken + username);
+            this.dataService.setNextToken(encryptedNextToken);
             this.router.navigate(['/home']);
           },
           async e => {

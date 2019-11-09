@@ -33,6 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
               this.dataService.setUsername('');
               this.dataService.setSessionKey('');
               this.dataService.setRsa({ privateKey: null, publicKey: null });
+              this.dataService.setNextToken('');
               this.router.navigate(['/login']);
             },
             async e => {

@@ -7,6 +7,8 @@ import { HttpService } from '../../../services/http.service';
 import { File } from '../../../interfaces/file';
 import { DataService } from 'src/app/services/data.service';
 
+import { decryptNextToken, encryptNextToken } from '../../../utils/index';
+
 
 @Component({
   selector: 'app-header',
@@ -44,13 +46,25 @@ export class HeaderComponent implements OnInit {
         }, {
           text: 'Ok',
           handler: (file: File) => {
-            this.httpService.getFile(file.name, this.dataService.getUsername()).subscribe(text => {
+            this.httpService.getFile(file.name, this.dataService.getUsername(), this.dataService.getNextToken()).subscribe(response => {
               const key = utils.utf8.toBytes(this.dataService.getSessionKey());
               const iv = utils.utf8.toBytes(this.dataService.getInitVector());
-              const encryptedBytes = utils.hex.toBytes(text);
+              const encryptedBytes = utils.hex.toBytes(response.text);
               const aesCbc = new ModeOfOperation.cbc(key, iv);
               const decryptedBytes = aesCbc.decrypt(encryptedBytes);
               const decryptedText = utils.utf8.fromBytes(padding.pkcs7.strip(decryptedBytes));
+
+              const decryptedNextToken = decryptNextToken(
+                this.dataService.getSessionKey(),
+                this.dataService.getInitVector(),
+                response.nextToken
+              );
+              const encryptedNextToken = encryptNextToken(
+                this.dataService.getSessionKey(),
+                this.dataService.getInitVector(),
+                decryptedNextToken + this.dataService.getUsername(),
+              );
+              this.dataService.setNextToken(encryptedNextToken);
 
               this.getFile.emit(decryptedText);
             },

@@ -4,32 +4,54 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { IPublicKey } from '../interfaces/rsa';
+import { DataService } from './data.service';
+
+import { utils, padding, ModeOfOperation } from 'aes-js';
+import { decryptNextToken, encryptNextToken } from '../utils/index';
 
 export interface ISessionResponse {
   sessionKey: string;
   initVector: string;
+  nextToken: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpService {
-  serverUrl = 'http://10.160.58.116';
+  serverUrl = 'http://192.168.0.12';
   port = 8080;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private dataService: DataService,
+  ) { }
 
-  getFile(fileName: string, username: string): Observable<string> {
-    return this.http.get(`${this.serverUrl}:${this.port}/files`, {
+  getFile(fileName: string, username: string, decryptedNextToken: string): Observable<{ text: string, nextToken: string }> {
+    return this.http.get<{ text: string, nextToken: string }>(`${this.serverUrl}:${this.port}/files`, {
       params:  {
         name: fileName,
         username,
+        nextToken: decryptedNextToken,
       },
-      responseType: 'text',
+      responseType: 'json',
     }).pipe(
       catchError(e => {
         if (e.error) {
-          return throwError((JSON.parse(e.error) as any).message);
+          if (JSON.parse(e.error.message).nextToken) {
+            const dNextToken = decryptNextToken(
+              this.dataService.getSessionKey(),
+              this.dataService.getInitVector(),
+              JSON.parse(e.error.message).nextToken,
+            );
+            const eNextToken = encryptNextToken(
+              this.dataService.getSessionKey(),
+              this.dataService.getInitVector(),
+              dNextToken + username
+            );
+            this.dataService.setNextToken(eNextToken);
+          }
+          return throwError(JSON.parse(e.error.message).text);
         } else {
           return throwError('Something went wrong');
         }
@@ -53,10 +75,17 @@ export class HttpService {
     );
   }
 
-  login(username: string, encryptedPassword: string): Observable<any> {
-    return this.http.post(
+  login(username: string, encryptedPassword: string, decryptedNextToken: string): Observable<{ nextToken: string }> {
+    return this.http.post<{ nextToken: string }>(
       `${this.serverUrl}:${this.port}/login`,
       { username, password: encryptedPassword },
+      {
+        params: {
+          nextToken: decryptedNextToken,
+          username,
+        },
+        responseType: 'json',
+      }
     ).pipe(
       catchError(e => {
         if (e.error) {

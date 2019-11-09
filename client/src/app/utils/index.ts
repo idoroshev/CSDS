@@ -1,3 +1,5 @@
+import { utils, padding, ModeOfOperation } from 'aes-js';
+
 export function isPrime(num: number) {
   const s = Math.sqrt(num);
   for (let i = 2; i <= s; ++i) {
@@ -35,4 +37,24 @@ export function pow(a: number, b: number, mod: number): number {
   }
 
   return result;
+}
+
+export function encryptNextToken(sessionKey: string, initVector: string, nextToken: string): string {
+  const key = utils.utf8.toBytes(sessionKey);
+  const iv = utils.utf8.toBytes(initVector);
+  const textBytes = utils.utf8.toBytes(nextToken);
+  const aesCbc = new ModeOfOperation.cbc(key, iv);
+  const encryptedBytes = aesCbc.encrypt(padding.pkcs7.pad(textBytes));
+  const encryptedHex = utils.hex.fromBytes(encryptedBytes);
+  return encryptedHex;
+}
+
+export function decryptNextToken(sessionKey: string, initVector: string, nextToken: string): string {
+  const key = utils.utf8.toBytes(sessionKey);
+  const iv = utils.utf8.toBytes(initVector);
+  const encryptedBytes = utils.hex.toBytes(nextToken);
+  const aesCbc = new ModeOfOperation.cbc(key, iv);
+  const decryptedBytes = aesCbc.decrypt(encryptedBytes);
+  const decryptedNextToken = utils.utf8.fromBytes(padding.pkcs7.strip(decryptedBytes));
+  return decryptedNextToken;
 }
