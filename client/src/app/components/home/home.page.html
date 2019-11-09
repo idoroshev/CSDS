@@ -1,9 +1,25 @@
-<app-header (getFile)="onGetFile($event)"></app-header>
+<app-header
+  (getFile)="onGetFile($event)"
+  (changeUpload)="onChangeUpload($event)"
+></app-header>
 
 <ion-content class="ion-padding">
-  <ion-textarea
-    value="{{text}}"
-    autoGrow="true"
-  >
-  </ion-textarea>
+  <div *ngIf="!isUpload">
+      <ion-textarea
+        value="{{text}}"
+        autoGrow="true"
+      >
+      </ion-textarea>
+  </div>
+  <div *ngIf="isUpload">
+      <ion-button (click)="uploadFile()">Upload file</ion-button>
+      <ion-input [(ngModel)]="filename" placeholder="Enter filename"></ion-input>
+      <ion-textarea
+        cols="100"
+        rows="100"
+        [(ngModel)]="fileInput"
+        placeholder="Enter some text"
+      >
+      </ion-textarea>
+  </div>
 </ion-content>

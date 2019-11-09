@@ -16,7 +16,9 @@ import { decryptNextToken, encryptNextToken } from '../../../utils/index';
 })
 export class HeaderComponent implements OnInit {
   title = 'BakDor';
+  isUpload = false;
   @Output() getFile = new EventEmitter<string>();
+  @Output() changeUpload = new EventEmitter<boolean>();
 
   constructor(
     private alertController: AlertController,
@@ -101,4 +103,8 @@ export class HeaderComponent implements OnInit {
     });
   }
 
+  changeIsUpload() {
+    this.isUpload = !this.isUpload;
+    this.changeUpload.emit(this.isUpload);
+  }
 }

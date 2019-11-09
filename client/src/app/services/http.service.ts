@@ -97,6 +97,28 @@ export class HttpService {
     );
   }
 
+  upload(username: string, name: string, text: string, decryptedNextToken: string): Observable<{ nextToken: string }> {
+    return this.http.post<{ nextToken: string }>(
+      `${this.serverUrl}:${this.port}/files`,
+      { username, name, text },
+      {
+        params: {
+          nextToken: decryptedNextToken,
+          username,
+        },
+        responseType: 'json',
+      }
+    ).pipe(
+      catchError(e => {
+        if (e.error) {
+          return throwError((JSON.parse(e.error) as any).message);
+        } else {
+          return throwError('Something went wrong');
+        }
+      }),
+    );
+  }
+
   logout(): Observable<any> {
     return this.http.post(
       `${this.serverUrl}:${this.port}/logout`,
