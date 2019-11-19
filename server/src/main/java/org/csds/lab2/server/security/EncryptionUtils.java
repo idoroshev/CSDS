@@ -35,9 +35,13 @@ public class EncryptionUtils {
     }
 
     public static String generateRandomKey() {
+        return generateRandomKey(16);
+    }
+
+    public static String generateRandomKey(int length) {
         SecureRandom r = new SecureRandom();
         StringBuilder key = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < length; i++) {
             key.append(Character.toString((char) (r.nextInt(26) + 97)));
         }
         return key.toString();

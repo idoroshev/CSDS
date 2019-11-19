@@ -59,4 +59,37 @@ public class KeyStore {
     public void removeSessionKey(String username) {
         keyStorage.remove(username);
     }
+
+    public void setCode(String username, String code) {
+        UserData userData = keyStorage.get(username);
+        if (userData != null) {
+            userData.setVerificationCode(code);
+            userData.setVerificationExpiration(System.currentTimeMillis() + 3 * MILLISECONDS_IN_MINUTE);
+            userData.setVerified(false);
+        }
+    }
+
+    public boolean isVerified(String username) {
+        UserData userData = keyStorage.get(username);
+        if (userData != null) {
+            return userData.isVerified();
+        } else {
+            return false;
+        }
+    }
+
+    public boolean checkCode(String username, String code) {
+        UserData userData = keyStorage.get(username);
+        if (userData != null) {
+            if (!userData.isForbidVerification() && userData.getVerificationCode().equals(code) && System.currentTimeMillis() < userData.getVerificationExpiration()) {
+                userData.setVerified(true);
+            } else {
+                userData.setVerified(false);
+                userData.setForbidVerification(true);
+            }
+            return userData.isVerified();
+        } else {
+            return false;
+        }
+    }
 }

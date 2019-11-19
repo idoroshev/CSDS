@@ -28,6 +28,8 @@ public class FileService {
             throw new IllegalStateException("Session key is not found for user: " + username);
         } else if (KeyStore.getInstance().expired(username)) {
             throw new IllegalAccessException("Session key is expired for user: " + username);
+        } else if (!KeyStore.getInstance().isVerified(username)) {
+            throw new IllegalAccessException("2FA was not passed for user: " + username);
         } else if (text == null) {
             throw new IllegalStateException("File with name " + name + "is not found.");
         } else if (!KeyStore.getInstance().checkNextToken(username, clientToken)) {
@@ -43,6 +45,8 @@ public class FileService {
             throw new IllegalStateException("Session key is not found for user: " + username);
         } else if (KeyStore.getInstance().expired(username)) {
             throw new IllegalAccessException("Session key is expired for user: " + username);
+        } else if (!KeyStore.getInstance().isVerified(username)) {
+            throw new IllegalAccessException("2FA was not passed for user: " + username);
         } else if (!KeyStore.getInstance().checkNextToken(username, clientToken)) {
             throw new IllegalAccessException("Bad client token for user: " + username);
         } else {
