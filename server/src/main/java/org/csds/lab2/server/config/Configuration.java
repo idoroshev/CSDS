@@ -10,7 +10,6 @@ public class Configuration {
     @Value("${jdbc.url}")
     private String jdbcUrl;
 
-
     public String getJdbcUrl() {
         return jdbcUrl;
     }

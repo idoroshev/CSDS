@@ -22,6 +22,7 @@ public class SimpleAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Autowired
     public SimpleAuthenticationFilter(AuthenticationManager manager) {
         super.setAuthenticationManager(manager);
+        super.setAuthenticationSuccessHandler(new LoginSuccessHandler());
     }
 
     @Override
@@ -37,7 +38,7 @@ public class SimpleAuthenticationFilter extends UsernamePasswordAuthenticationFi
         try {
             User user = objectMapper.readValue(body, User.class);
             String sessionKey = KeyStore.getInstance().getSessionKey(user.getUsername());
-            if (sessionKey != null) {
+            if (sessionKey != null && KeyStore.getInstance().checkNextToken(user.getUsername(), request.getParameter("nextToken"))) {
                 System.out.println("Encrypted pass: " + user.getPassword());
                 String decryptedPassword = EncryptionUtils.decryptByAES(user.getPassword(), sessionKey);
                 user.setPassword(decryptedPassword);
@@ -47,7 +48,6 @@ public class SimpleAuthenticationFilter extends UsernamePasswordAuthenticationFi
                         = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 
                 setDetails(request, token);
-
                 return this.getAuthenticationManager().authenticate(token);
 
             } else {
@@ -60,48 +60,4 @@ public class SimpleAuthenticationFilter extends UsernamePasswordAuthenticationFi
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return null;
     }
-
-    /*@Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
-
-        if (request.getRequestURI().equals("/login")) {
-            String body = "";
-            try {
-                body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                User user = objectMapper.readValue(body, User.class);
-                String sessionKey = KeyStore.getInstance().getSessionKey(user.getUsername());
-                if (sessionKey != null) {
-                    System.out.println("Encrypted pass: " + user.getPassword());
-                    String decryptedPassword = EncryptionUtils.decryptByAES(user.getPassword(), sessionKey);
-                    user.setPassword(decryptedPassword);
-
-                    System.out.println("Decrypted pass: " + decryptedPassword);
-                } else {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cannot find session key generated.");
-                }
-            } catch (Exception e) {
-                try {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Cannot find session key generated.");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-
-        chain.doFilter(req, res);
-    }*/
-
-    /*@Override
-    @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        super.setAuthenticationManager(authenticationManager);
-    }*/
 }
