@@ -19,7 +19,7 @@ export interface ISessionResponse {
   providedIn: 'root'
 })
 export class HttpService {
-  serverUrl = 'http://192.168.0.12';
+  serverUrl = 'http://10.160.10.13';
   port = 8080;
 
   constructor(
@@ -82,6 +82,29 @@ export class HttpService {
       {
         params: {
           nextToken: decryptedNextToken,
+          username,
+        },
+        responseType: 'json',
+      }
+    ).pipe(
+      catchError(e => {
+        if (e.error) {
+          return throwError((JSON.parse(e.error) as any).message);
+        } else {
+          return throwError('Something went wrong');
+        }
+      }),
+    );
+  }
+
+  verify(code: string, username: string, nextToken: string): Observable<{ nextToken: string }> {
+    return this.http.post<{ nextToken: string }>(
+      `${this.serverUrl}:${this.port}/verify`,
+      null,
+      {
+        params: {
+          nextToken,
+          code,
           username,
         },
         responseType: 'json',

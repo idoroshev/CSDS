@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 import { HttpService, ISessionResponse } from 'src/app/services/http.service';
@@ -23,6 +23,7 @@ export class LoginComponent {
   constructor(
     private httpService: HttpService,
     private router: Router,
+    private alertController: AlertController,
     private toastController: ToastController,
     private rsaService: RsaService,
     private dataService: DataService,
@@ -58,12 +59,49 @@ export class LoginComponent {
         this.dataService.setNextToken(encryptedNextToken);
 
         this.httpService.login(username, encryptedHex, encryptedNextToken).subscribe(
-          ({ nextToken }) => {
-            console.log(nextToken);
+          async ({ nextToken }) => {
             decryptedNextToken = decryptNextToken(sessionKey, initVector, nextToken);
             encryptedNextToken = encryptNextToken(sessionKey, initVector, decryptedNextToken + username);
             this.dataService.setNextToken(encryptedNextToken);
-            this.router.navigate(['/home']);
+
+            const alert = await this.alertController.create({
+              header: 'Enter verification name',
+              inputs: [
+                {
+                  name: 'name',
+                  type: 'text',
+                  placeholder: 'Enter verification code',
+                },
+              ],
+              buttons: [
+                {
+                  text: 'Cancel',
+                  role: 'cancel',
+                  cssClass: 'secondary',
+                }, {
+                  text: 'Ok',
+                  handler: (code: { name: string }) => {
+                    this.httpService.verify(code.name, this.dataService.getUsername(), this.dataService.getNextToken()).subscribe(({ nextToken }) => {
+                      decryptedNextToken = decryptNextToken(sessionKey, initVector, nextToken);
+                      encryptedNextToken = encryptNextToken(sessionKey, initVector, decryptedNextToken + username);
+                      this.dataService.setNextToken(encryptedNextToken);
+
+                      this.router.navigate(['/home']);
+                    },
+                    async e => {
+                      const errorToast = await this.toastController.create({
+                        message: e,
+                        duration: 2000,
+                        color: 'danger',
+                      });
+                      await errorToast.present();
+                    });
+                  }
+                }
+              ]
+            });
+
+            await alert.present();
           },
           async e => {
             const errorToast = await this.toastController.create({
