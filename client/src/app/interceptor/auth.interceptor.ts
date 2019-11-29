@@ -33,11 +33,29 @@ export class AuthInterceptor implements HttpInterceptor {
               this.dataService.setUsername('');
               this.dataService.setSessionKey('');
               this.dataService.setRsa({ privateKey: null, publicKey: null });
+              this.dataService.setNextToken('');
               this.router.navigate(['/login']);
             },
             async e => {
               const errorToast = await this.toastController.create({
-                message: e,
+                message: 'Something went wrong',
+                duration: 2000,
+                color: 'danger',
+              });
+              await errorToast.present();
+            });
+          } else if (err.status === 423) {
+            this.httpService.logout().subscribe(() => {
+              this.dataService.setInitVector('');
+              this.dataService.setUsername('');
+              this.dataService.setSessionKey('');
+              this.dataService.setRsa({ privateKey: null, publicKey: null });
+              this.dataService.setNextToken('');
+              this.router.navigate(['/login']);
+            },
+            async e => {
+              const errorToast = await this.toastController.create({
+                message: 'Something went wrong',
                 duration: 2000,
                 color: 'danger',
               });

@@ -5,6 +5,11 @@
         <ion-icon slot="icon-only" name="document"></ion-icon>
       </ion-button>
     </ion-buttons>
+    <ion-buttons slot="secondary">
+      <ion-button (click)="changeIsUpload()">
+        <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-buttons slot="primary" *ngIf="!this.dataService.getSessionKey()">
       <ion-button (click)="login()">
         <ion-icon slot="icon-only" name="log-in"></ion-icon>
